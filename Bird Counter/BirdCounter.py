@@ -7,10 +7,13 @@ from datetime import datetime
 from tkinter import *
 from tkinter import ttk
 
-directory = r"C:\Users\mjc715\Desktop\Personal Projects\Bird Counter\Bird Pics"
-os.chdir(directory)
+os.chdir("Bird Counter")
+pwd = os.getcwd()
+photoDirectory = pwd + "/Bird Pics"
+os.chdir("Bird Pics")
 
 global ROI
+global cam
 
 
 def selectFeeder():
@@ -25,6 +28,7 @@ def selectFeeder():
 
 
 def start():
+    global cam
     i = 0
     stop = False
     cam = cv2.VideoCapture(0)
@@ -46,7 +50,8 @@ def start():
 
         if whiteness > 50:
             if whiteness > 50 and stop == False:
-                filename = "bird" + str(i) + ".jpg"
+                string = datetime.now().strftime("%d/%m, %H:%M")
+                filename = string + ".jpg"
                 cv2.imwrite(filename, frame)
                 i += 1
                 stop = True
@@ -64,19 +69,25 @@ def start():
     cv2.destroyAllWindows()
 
 
-root = Tk()
-root.title("Bird Counter")
-root.geometry("800x500")
-mainframe = ttk.Frame(root, padding="3 3 12 12")
-mainframe.grid(column=0, row=0, sticky="NWES")
+def exit():
+    if "cam" in globals():
+        cam.release()
+        cv2.destroyAllWindows()
+    root.destroy()
 
-ttk.Button(mainframe, text="Select Feeder", command=selectFeeder).grid(
-    column=1, row=1, sticky="NSWE"
-)
-ttk.Button(mainframe, text="Start Watch", command=start).grid(
-    column=1, row=2, sticky="NSWE"
-)
-root.grid_columnconfigure(1, weight=1)
+
+root = Tk()
+root.title("Bird Catcher")
+root.geometry("330x240")
+root.resizable(False, False)
+mainframe = ttk.Frame(root, padding="3 3 12 12")
+mainframe.grid(column=0, row=0)
+
+ttk.Button(mainframe, text="Select Feeder", command=selectFeeder).grid(column=0, row=1)
+ttk.Button(mainframe, text="Start Watch", command=start).grid(column=0, row=2)
+ttk.Button(mainframe, text="Exit", command=exit).grid(column=0, row=3)
+ttk.Label(mainframe, text="Welcome to Bird Catcher").grid(column=0, row=0)
+root.grid_columnconfigure(0, weight=1)
+root.grid_rowconfigure(0, weight=1)
 root.grid_rowconfigure(1, weight=1)
-root.grid_rowconfigure(2, weight=1)
 root.mainloop()
